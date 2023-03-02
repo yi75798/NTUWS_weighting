@@ -9,7 +9,8 @@
 import pandas as pd
 import numpy as np
 from AnalysisTool.analysis import *
-from scipy.stats import chisquare
+# from scipy.stats import chisquare # 這個已經沒用了...
+from scipy.stats import chi2
 
 class weighting:
     def __init__(self, data, population_path='population.xlsx', weight_col_name='weight'):
@@ -91,7 +92,10 @@ class weighting:
         n = rounding(self.df[self.df[var] != -1][w_col].sum())
         if var == 'SEX':
             exp = np.array(n * self.N_SEX['ratio'])
-            chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
+            chi = np.square(obs - exp)/exp # 手算才是王道啦eo4!
+            chi = chi.sum()
+            p = chi2.sf(chi, 1)
+            # chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
 
             if message:    
                 print(f'chi2= {chi}, p = {p}')
@@ -108,7 +112,10 @@ class weighting:
                     return False
         if var == 'AGE':
             exp = np.array(n * self.N_AGE['ratio'])
-            chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
+            chi = np.square(obs - exp)/exp
+            chi = chi.sum()
+            p = chi2.sf(chi, 4)
+            #chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
 
             if message:    
                 print(f'chi2= {chi}, p = {p}')
@@ -125,7 +132,10 @@ class weighting:
                     return False
         if var == 'EDU':
             exp = np.array(n * self.N_EDU['ratio'])
-            chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
+            chi = np.square(obs - exp)/exp
+            chi = chi.sum()
+            p = chi2.sf(chi, 4)
+            # chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
 
             if message:    
                 print(f'chi2= {chi}, p = {p}')
@@ -142,7 +152,10 @@ class weighting:
                     return False
         if var == 'AREA':
             exp = np.array(n * self.N_AREA['ratio'])
-            chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
+            chi = np.square(obs - exp)/exp
+            chi = chi.sum()
+            p = chi2.sf(chi, 5)
+            # chi, p = chisquare(f_obs= obs, f_exp= exp, ddof= 0)
 
             if message:    
                 print(f'chi2= {chi}, p = {p}')
@@ -290,10 +303,9 @@ if __name__ == '__main__':
     dfw = weighting(data)
     dfw.chitest('AGE', message=True)
 
-    dfw = dfw.post_stratification()
+    # dfw = dfw.post_stratification()
     dfw = dfw.raking()
     dfw['weight'].sum()
-    
 
     
     
